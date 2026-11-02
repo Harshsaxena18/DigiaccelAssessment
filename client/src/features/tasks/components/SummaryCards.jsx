@@ -8,7 +8,6 @@ export const SummaryCards = ({ completedCount = 0, openCount = 0, label = 'This 
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
-      {/* Task Complete Card */}
       <div className="bg-[#EBF3FF] rounded-2xl p-4 sm:p-5 flex flex-col justify-between border border-blue-100/60 transition-transform duration-150 hover:scale-[1.01]">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-600/10 flex items-center justify-center text-blue-600">
@@ -29,7 +28,6 @@ export const SummaryCards = ({ completedCount = 0, openCount = 0, label = 'This 
         </div>
       </div>
 
-      {/* Task Pending Card */}
       <div className="bg-[#FFF0F0] rounded-2xl p-4 sm:p-5 flex flex-col justify-between border border-red-100/60 transition-transform duration-150 hover:scale-[1.01]">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-red-600/10 flex items-center justify-center text-red-600">

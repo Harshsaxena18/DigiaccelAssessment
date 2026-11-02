@@ -31,7 +31,6 @@ router.post(
   TaskController.createTask
 );
 
-// Dynamic routes by ID
 router.get(
   '/:id',
   validateRequest({ params: taskIdParamSchema }),

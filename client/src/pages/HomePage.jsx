@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Plus, ListFilter, Calendar as CalendarIcon, RefreshCw } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Plus, RefreshCw } from 'lucide-react';
 import { AppHeader } from '../components/AppHeader.jsx';
 import { OnboardingModal } from '../components/OnboardingModal.jsx';
 import { ConfirmDialog } from '../components/ConfirmDialog.jsx';
@@ -13,7 +14,6 @@ import { useWeeklySummary, useTaskMutations } from '../features/tasks/hooks/useT
 import {
   startOfWeekMonday,
   getDaysOfWeek,
-  startOfNextWeekMonday,
 } from '../features/tasks/utils/dateTime.js';
 
 export const HomePage = () => {
@@ -25,12 +25,12 @@ export const HomePage = () => {
   const [deletingTask, setDeletingTask] = useState(null);
 
   // Calendar & Filter States
-  const [currentWeekMonday, setCurrentWeekMonday] = useState(() => startOfWeekMonday(new Date()));
+  const [currentWeekMonday] = useState(() => startOfWeekMonday(new Date()));
   const [selectedDay, setSelectedDay] = useState(null);
   const [expandedWeekStart, setExpandedWeekStart] = useState(() => currentWeekMonday.toISOString());
 
   // Data Queries & Mutations
-  const { data: weeklySummaries = [], isLoading, isError, refetch } = useWeeklySummary();
+  const { data: weeklySummaries = [], isLoading, refetch } = useWeeklySummary();
   const { createTask, updateTask, updateTaskStatus, deleteTask } = useTaskMutations();
 
   // Days of current week for DaySelector
@@ -49,17 +49,6 @@ export const HomePage = () => {
       totalCount: 0,
     };
   }, [weeklySummaries, currentWeekMonday]);
-
-  // Overall totals across all tasks or active week
-  const overallCompleted = useMemo(
-    () => weeklySummaries.reduce((sum, w) => sum + (w.completedCount || 0), 0),
-    [weeklySummaries]
-  );
-  const overallOpen = useMemo(
-    () => weeklySummaries.reduce((sum, w) => sum + (w.openCount || 0), 0),
-    [weeklySummaries]
-  );
-  const overallTotal = overallCompleted + overallOpen;
 
   // Ensure current week is in the list of weeks displayed
   const displayedWeeks = useMemo(() => {
@@ -140,38 +129,30 @@ export const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-slate-100/70 sm:py-6 sm:px-4 flex justify-center">
-      {/* Responsive Main Container (App-width on mobile, elegant max-w-4xl card on desktop) */}
       <div className="w-full sm:max-w-xl md:max-w-2xl lg:max-w-4xl bg-white sm:rounded-3xl shadow-xl border border-slate-200/60 overflow-hidden flex flex-col min-h-screen sm:min-h-[880px] relative">
-        
-        {/* Main Content Area */}
         <main className="flex-1 px-5 pt-6 pb-28 sm:pb-12 flex flex-col gap-6">
-          {/* Header & Search Bar matching Figma */}
           <AppHeader
             onOpenSearch={() => setIsSearchOpen(true)}
             onOpenOnboarding={() => setIsOnboardingOpen(true)}
           />
 
-          {/* Horizontal Calendar Day Strip matching Figma */}
           <DaySelector
             days={weekDays}
             selectedDay={selectedDay}
             onSelectDay={setSelectedDay}
           />
 
-          {/* Metric Summary Cards matching Figma */}
           <SummaryCards
             completedCount={currentWeekSummary.completedCount}
             openCount={currentWeekSummary.openCount}
             label={selectedDay ? 'For Date' : 'This Week'}
           />
 
-          {/* Weekly Progress Bar matching Figma */}
           <WeeklyProgress
             completedCount={currentWeekSummary.completedCount}
             totalCount={currentWeekSummary.totalCount}
           />
 
-          {/* Weekly Tasks Section Header */}
           <div className="pt-2">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -189,27 +170,30 @@ export const HomePage = () => {
               </div>
               
               <div className="flex items-center gap-2">
-                <button
+                <motion.button
                   type="button"
+                  whileTap={{ rotate: 180 }}
                   onClick={() => refetch()}
                   className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
                   title="Refresh tasks"
                   aria-label="Refresh tasks"
                 >
                   <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                </button>
-                <button
+                </motion.button>
+
+                <motion.button
                   type="button"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.96 }}
                   onClick={handleOpenCreateModal}
                   className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5 stroke-[3]" />
                   <span>New Task</span>
-                </button>
+                </motion.button>
               </div>
             </div>
 
-            {/* List of Expandable Weeks */}
             <div className="flex flex-col gap-3">
               {displayedWeeks.map((week) => (
                 <WeekCard
@@ -231,19 +215,20 @@ export const HomePage = () => {
           </div>
         </main>
 
-        {/* Floating Action Button (FAB) at Bottom-Center matching Figma */}
         <div className="fixed sm:absolute bottom-6 inset-x-0 flex justify-center pointer-events-none z-30">
-          <button
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: 'spring', damping: 15, stiffness: 400 }}
             onClick={handleOpenCreateModal}
-            className="pointer-events-auto w-14 h-14 rounded-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white shadow-floating flex items-center justify-center transition-all duration-150 hover:scale-105 active:scale-95"
+            className="pointer-events-auto w-14 h-14 rounded-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white shadow-floating flex items-center justify-center transition-colors"
             aria-label="Add new task"
           >
             <Plus className="w-7 h-7 stroke-[2.5]" />
-          </button>
+          </motion.button>
         </div>
 
-        {/* Modals & Dialogs */}
         <TaskModal
           isOpen={isTaskModalOpen}
           onClose={handleCloseTaskModal}

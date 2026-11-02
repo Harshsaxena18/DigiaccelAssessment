@@ -14,7 +14,6 @@ export const WeeklyProgress = ({ completedCount = 0, totalCount = 0 }) => {
         </span>
       </div>
 
-      {/* Progress Track matching Figma */}
       <div className="w-full h-3 sm:h-3.5 bg-brand-100/60 rounded-full overflow-hidden p-0.5">
         <div
           className="h-full bg-slate-900 rounded-full transition-all duration-500 ease-out"

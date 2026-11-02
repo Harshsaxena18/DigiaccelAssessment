@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { Trash2, Edit3, Check, Calendar, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Trash2, Edit3, Check, Calendar } from 'lucide-react';
 import { formatTaskTime } from '../utils/dateTime.js';
 
 export const TaskItem = ({ task, onToggleStatus, onEdit, onDelete }) => {
@@ -7,7 +8,7 @@ export const TaskItem = ({ task, onToggleStatus, onEdit, onDelete }) => {
   const touchStartXRef = useRef(0);
   const isCompleted = task.status === 'COMPLETED';
 
-  // Handle Touch Swipe (Swipe left to reveal Delete)
+  // Touch swipe to reveal delete
   const handleTouchStart = (e) => {
     touchStartXRef.current = e.touches[0].clientX;
   };
@@ -15,7 +16,6 @@ export const TaskItem = ({ task, onToggleStatus, onEdit, onDelete }) => {
   const handleTouchMove = (e) => {
     const currentX = e.touches[0].clientX;
     const diff = touchStartXRef.current - currentX;
-    // Allow dragging up to 80px to the left
     if (diff > 0 && diff < 120) {
       setSwipeOffset(-diff);
     } else if (diff <= 0) {
@@ -25,9 +25,9 @@ export const TaskItem = ({ task, onToggleStatus, onEdit, onDelete }) => {
 
   const handleTouchEnd = () => {
     if (swipeOffset < -40) {
-      setSwipeOffset(-80); // Keep open
+      setSwipeOffset(-80);
     } else {
-      setSwipeOffset(0); // Snap closed
+      setSwipeOffset(0);
     }
   };
 
@@ -46,8 +46,14 @@ export const TaskItem = ({ task, onToggleStatus, onEdit, onDelete }) => {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-white border border-slate-100 shadow-sm transition-all duration-150 hover:shadow-card hover:border-slate-200">
-      {/* Hidden Swipe Action Background (Visible on swipe-left on touch devices) */}
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.2 }}
+      className="relative overflow-hidden rounded-2xl bg-white border border-slate-100 shadow-sm transition-all duration-150 hover:shadow-card hover:border-slate-200"
+    >
       <div className="absolute inset-y-0 right-0 w-24 bg-red-600 flex items-center justify-center text-white">
         <button
           type="button"
@@ -56,14 +62,13 @@ export const TaskItem = ({ task, onToggleStatus, onEdit, onDelete }) => {
             onDelete(task);
           }}
           className="w-full h-full flex flex-col items-center justify-center gap-1 text-xs font-semibold"
-          aria-label="Delete task via swipe"
+          aria-label="Delete task"
         >
           <Trash2 className="w-5 h-5" />
           <span>Delete</span>
         </button>
       </div>
 
-      {/* Main Task Foreground Container */}
       <div
         className="relative bg-white px-4 py-3.5 flex items-center justify-between gap-3 transition-transform duration-150"
         style={{ transform: `translateX(${swipeOffset}px)` }}
@@ -71,10 +76,10 @@ export const TaskItem = ({ task, onToggleStatus, onEdit, onDelete }) => {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Left: Checkbox & Task Title */}
         <div className="flex items-center gap-3.5 flex-1 min-w-0">
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.85 }}
             onClick={() => onToggleStatus(task)}
             role="checkbox"
             aria-checked={isCompleted}
@@ -85,13 +90,24 @@ export const TaskItem = ({ task, onToggleStatus, onEdit, onDelete }) => {
                 : 'border-2 border-slate-300 hover:border-brand-500 bg-white'
             }`}
           >
-            {isCompleted && <Check className="w-4 h-4 stroke-[3]" />}
-          </button>
+            <AnimatePresence>
+              {isCompleted && (
+                <motion.div
+                  initial={{ scale: 0, rotate: -45 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  exit={{ scale: 0 }}
+                  transition={{ type: 'spring', damping: 15, stiffness: 400 }}
+                >
+                  <Check className="w-4 h-4 stroke-[3]" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span
-                className={`text-sm sm:text-base font-semibold truncate transition-colors duration-150 ${
+                className={`text-sm sm:text-base font-semibold truncate transition-all duration-150 ${
                   isCompleted
                     ? 'line-through text-slate-400'
                     : 'text-slate-800'
@@ -117,29 +133,32 @@ export const TaskItem = ({ task, onToggleStatus, onEdit, onDelete }) => {
           </div>
         </div>
 
-        {/* Right: Actions matching Figma (Trash icon & Pencil edit icon) */}
         <div className="flex items-center gap-1 flex-shrink-0">
-          <button
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
             onClick={() => onDelete(task)}
             className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             title="Delete task"
             aria-label={`Delete ${task.title}`}
           >
             <Trash2 className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
             onClick={() => onEdit(task)}
             className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
             title="Edit task"
             aria-label={`Edit ${task.title}`}
           >
             <Edit3 className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-          </button>
+          </motion.button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

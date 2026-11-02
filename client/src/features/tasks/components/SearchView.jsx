@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Search, X } from 'lucide-react';
 import { useSearchTasks } from '../hooks/useTasks.js';
 import { TaskItem } from './TaskItem.jsx';
@@ -7,7 +8,6 @@ export const SearchView = ({ onClose, onToggleStatus, onEditTask, onDeleteTask }
   const [searchInput, setSearchInput] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
 
-  // Debounce search input by 300ms
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(searchInput.trim());
@@ -19,18 +19,23 @@ export const SearchView = ({ onClose, onToggleStatus, onEditTask, onDeleteTask }
   const tasks = data?.data || [];
 
   return (
-    <div className="w-full flex flex-col min-h-screen bg-slate-50 animate-in fade-in duration-200">
-      {/* Top Search Bar Header matching Figma Frame 9 */}
-      <div className="bg-white border-b border-slate-200/80 px-4 py-3.5 sticky top-0 z-20">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="w-full flex flex-col min-h-screen bg-slate-50"
+    >
+      <div className="bg-white border-b border-slate-200/80 px-4 py-3.5 sticky top-0 z-20 shadow-sm">
         <div className="flex items-center gap-3">
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.9 }}
             onClick={onClose}
             className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors"
             aria-label="Back to tasks"
           >
             <ArrowLeft className="w-5 h-5" />
-          </button>
+          </motion.button>
 
           <div className="relative flex-1">
             <input
@@ -65,7 +70,11 @@ export const SearchView = ({ onClose, onToggleStatus, onEditTask, onDeleteTask }
             <span className="text-sm font-medium">Searching tasks...</span>
           </div>
         ) : debouncedQuery && tasks.length === 0 ? (
-          <div className="py-16 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="py-16 text-center"
+          >
             <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400 mb-3">
               <Search className="w-6 h-6" />
             </div>
@@ -73,7 +82,7 @@ export const SearchView = ({ onClose, onToggleStatus, onEditTask, onDeleteTask }
             <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
               We couldn't find any task matching "{debouncedQuery}". Try checking for typos or searching a different keyword.
             </p>
-          </div>
+          </motion.div>
         ) : !debouncedQuery ? (
           <div className="py-16 text-center text-xs text-slate-400 font-medium">
             Type keywords above to search across all your scheduled tasks.
@@ -84,19 +93,21 @@ export const SearchView = ({ onClose, onToggleStatus, onEditTask, onDeleteTask }
               Found {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
             </div>
             <div className="flex flex-col gap-2.5">
-              {tasks.map((task) => (
-                <TaskItem
-                  key={task._id}
-                  task={task}
-                  onToggleStatus={onToggleStatus}
-                  onEdit={onEditTask}
-                  onDelete={onDeleteTask}
-                />
-              ))}
+              <AnimatePresence mode="popLayout">
+                {tasks.map((task) => (
+                  <TaskItem
+                    key={task._id}
+                    task={task}
+                    onToggleStatus={onToggleStatus}
+                    onEdit={onEditTask}
+                    onDelete={onDeleteTask}
+                  />
+                ))}
+              </AnimatePresence>
             </div>
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };

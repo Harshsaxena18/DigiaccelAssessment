@@ -62,7 +62,7 @@ export class TaskService {
     const skip = (page - 1) * limit;
 
     const [tasks, totalItems] = await Promise.all([
-      Task.find(filter).sort(sortOptions).skip(skip).limit(limit).lean(),
+      Task.find(filter).select('-__v').sort(sortOptions).skip(skip).limit(limit).lean(),
       Task.countDocuments(filter),
     ]);
 
@@ -83,7 +83,7 @@ export class TaskService {
    * Get single task by ID
    */
   static async getTaskById(id) {
-    const task = await Task.findById(id);
+    const task = await Task.findById(id).select('-__v');
     if (!task) {
       throw ApiError.notFound(`Task with ID ${id} not found`);
     }

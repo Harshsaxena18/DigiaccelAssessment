@@ -97,7 +97,7 @@ export const formatTaskTime = (date) => {
 };
 
 /**
- * Formats full readable date, e.g. "Friday 14, January" (matching Figma)
+ * Formats full readable date, e.g. "Friday 14, January"
  */
 export const formatTaskDateReadable = (date) => {
   if (!date) return '';

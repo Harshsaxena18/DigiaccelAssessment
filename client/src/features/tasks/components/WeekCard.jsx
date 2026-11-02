@@ -1,5 +1,6 @@
 import React from 'react';
-import { ChevronDown, ChevronUp, Calendar, CheckCircle2, Clock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, Calendar, CheckCircle2, Clock } from 'lucide-react';
 import { formatWeekRange, startOfNextWeekMonday } from '../utils/dateTime.js';
 import { useTasksByDateRange } from '../hooks/useTasks.js';
 import { TaskItem } from './TaskItem.jsx';
@@ -39,7 +40,6 @@ export const WeekCard = ({
 
   return (
     <div className="w-full bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden transition-all duration-200">
-      {/* Week Header Banner / Expander */}
       <button
         type="button"
         onClick={onToggleExpand}
@@ -72,43 +72,55 @@ export const WeekCard = ({
           <span className="text-xs font-semibold px-2.5 py-1 bg-slate-100 rounded-full text-slate-600">
             {weekSummary.totalCount} {weekSummary.totalCount === 1 ? 'task' : 'tasks'}
           </span>
-          {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-slate-500" />
-          ) : (
+          <motion.div
+            animate={{ rotate: isExpanded ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
             <ChevronDown className="w-5 h-5 text-slate-500" />
-          )}
+          </motion.div>
         </div>
       </button>
 
-      {/* Expanded Tasks List */}
-      {isExpanded && (
-        <div className="px-4 sm:px-5 pb-5 pt-2 border-t border-slate-100 bg-slate-50/40">
-          {isLoading ? (
-            <div className="py-6 flex flex-col items-center justify-center gap-2 text-slate-400">
-              <div className="w-5 h-5 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
-              <span className="text-xs font-medium">Loading tasks...</span>
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 sm:px-5 pb-5 pt-2 border-t border-slate-100 bg-slate-50/40">
+              {isLoading ? (
+                <div className="py-6 flex flex-col items-center justify-center gap-2 text-slate-400">
+                  <div className="w-5 h-5 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs font-medium">Loading tasks...</span>
+                </div>
+              ) : filteredTasks.length === 0 ? (
+                <div className="py-6 text-center text-xs font-medium text-slate-400">
+                  {selectedDay
+                    ? 'No tasks scheduled for the selected day in this week.'
+                    : 'No tasks scheduled in this week.'}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2.5 mt-1">
+                  <AnimatePresence mode="popLayout">
+                    {filteredTasks.map((task) => (
+                      <TaskItem
+                        key={task._id}
+                        task={task}
+                        onToggleStatus={onToggleStatus}
+                        onEdit={onEditTask}
+                        onDelete={onDeleteTask}
+                      />
+                    ))}
+                  </AnimatePresence>
+                </div>
+              )}
             </div>
-          ) : filteredTasks.length === 0 ? (
-            <div className="py-6 text-center text-xs font-medium text-slate-400">
-              {selectedDay
-                ? 'No tasks scheduled for the selected day in this week.'
-                : 'No tasks scheduled in this week.'}
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2.5 mt-1">
-              {filteredTasks.map((task) => (
-                <TaskItem
-                  key={task._id}
-                  task={task}
-                  onToggleStatus={onToggleStatus}
-                  onEdit={onEditTask}
-                  onDelete={onDeleteTask}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

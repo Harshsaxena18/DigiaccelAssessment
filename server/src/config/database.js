@@ -2,13 +2,18 @@ import mongoose from 'mongoose';
 import { env } from './env.js';
 
 let memoryServerInstance = null;
+let cachedConn = null;
 
 export const connectDatabase = async () => {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
   try {
-    // Attempt connecting to the configured URI
     const conn = await mongoose.connect(env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 2500,
+      serverSelectionTimeoutMS: 5000,
     });
+    cachedConn = conn;
     console.log(`[Database] MongoDB connected: ${conn.connection.host}`);
     return conn;
   } catch (err) {

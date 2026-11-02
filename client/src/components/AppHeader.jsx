@@ -1,10 +1,9 @@
 import React from 'react';
-import { Search, Settings, Bell, Sparkles } from 'lucide-react';
+import { Search, Settings, Sparkles } from 'lucide-react';
 
 export const AppHeader = ({ onOpenSearch, onOpenOnboarding }) => {
   return (
     <header className="w-full">
-      {/* Top Mobile/Desktop Bar */}
       <div className="flex items-center justify-between pb-4">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-md">
@@ -23,23 +22,14 @@ export const AppHeader = ({ onOpenSearch, onOpenOnboarding }) => {
         <div className="flex items-center gap-1.5">
           <button
             onClick={onOpenOnboarding}
-            title="View Figma Welcome Screen"
             className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors"
-            aria-label="View Onboarding"
+            aria-label="App info"
           >
             <Settings className="w-5 h-5" />
-          </button>
-          <button
-            className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors relative"
-            aria-label="Notifications"
-          >
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-brand-600 rounded-full ring-2 ring-white" />
           </button>
         </div>
       </div>
 
-      {/* Search Input Bar matching Figma */}
       <div className="mt-1">
         <button
           type="button"
