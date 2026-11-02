@@ -31,7 +31,7 @@ export const createApp = () => {
 
   app.use(express.json({ limit: '10kb' }));
 
-  app.get('/api/v1/health', (req, res) => {
+  app.get(['/api/v1/health', '/api/health', '/v1/health', '/health'], (req, res) => {
     res.status(200).json({
       status: 'ok',
       uptime: process.uptime(),
@@ -40,6 +40,8 @@ export const createApp = () => {
   });
 
   app.use('/api/v1/tasks', taskRoutes);
+  app.use('/v1/tasks', taskRoutes);
+  app.use('/api/tasks', taskRoutes);
 
   app.use(notFound);
   app.use(errorHandler);
