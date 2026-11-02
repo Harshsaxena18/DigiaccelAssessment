@@ -1,0 +1,15 @@
+{
+  "name": "todo-list-app-root",
+  "version": "1.0.0",
+  "description": "Fullstack SDE-1 To-Do List Application (MERN)",
+  "private": true,
+  "scripts": {
+    "dev:server": "npm.cmd --prefix server run dev",
+    "dev:client": "npm.cmd --prefix client run dev",
+    "start:server": "npm.cmd --prefix server start",
+    "build:client": "npm.cmd --prefix client run build",
+    "test:server": "npm.cmd --prefix server test",
+    "test:client": "npm.cmd --prefix client test",
+    "test": "npm.cmd --prefix server test && npm.cmd --prefix client test"
+  }
+}
