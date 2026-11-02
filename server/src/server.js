@@ -2,11 +2,11 @@ import { createApp } from './app.js';
 import { env } from './config/env.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
 
+export const app = createApp();
+
 const startServer = async () => {
   try {
     await connectDatabase();
-
-    const app = createApp();
 
     const server = app.listen(env.PORT, () => {
       console.log(`[Server] To-Do API listening on port ${env.PORT} (${env.NODE_ENV})`);
@@ -29,4 +29,8 @@ const startServer = async () => {
   }
 };
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;

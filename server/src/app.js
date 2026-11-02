@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import { env } from './config/env.js';
 import { taskRoutes } from './modules/tasks/task.routes.js';
+import { connectDatabase } from './config/database.js';
 import { notFound } from './middleware/notFound.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -37,6 +38,22 @@ export const createApp = () => {
       uptime: process.uptime(),
       timestamp: new Date().toISOString(),
     });
+  });
+
+  app.use(async (req, res, next) => {
+    try {
+      await connectDatabase();
+      next();
+    } catch (err) {
+      console.error('[Database] Connection failed on request:', err.message);
+      res.status(503).json({
+        success: false,
+        error: {
+          code: 'DATABASE_UNAVAILABLE',
+          message: 'Database is currently connecting or unavailable. Please retry in a moment.',
+        },
+      });
+    }
   });
 
   app.use('/api/v1/tasks', taskRoutes);
